@@ -53,7 +53,9 @@ const DashboardPage = () => {
               {selectedModels.length > 0 ? (
                 <ChatInput addMessage={addMessage} />
               ) : (
-                <p className="text-center text-gray-600">Please select at least one model to chat with.</p>
+                <p className="text-center text-gray-600 font-bold">
+                  Please select at least one model to chat with.
+                </p>
               )}
             </div>
           </div>
