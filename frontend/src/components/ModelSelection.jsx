@@ -2,15 +2,37 @@
 
 import React from 'react';
 
-const ModelSelection = () => {
+const ModelSelection = ({ selectedModels, setSelectedModels }) => {
+  const models = ['Model 1', 'Model 2', 'Model 3', 'Model 4', 'Model 5'];
+
+  const handleToggle = (model) => {
+    setSelectedModels((prevSelected) => {
+      if (prevSelected.includes(model)) {
+        return prevSelected.filter((m) => m !== model);
+      } else {
+        return [...prevSelected, model];
+      }
+    });
+  };
+
   return (
     <div>
       <h2 className="text-lg font-bold mb-4">Model Selection</h2>
-      <select className="w-full p-2 border border-gray-300 rounded">
-        <option value="model1">Model 1</option>
-        <option value="model2">Model 2</option>
-        <option value="model3">Model 3</option>
-      </select>
+      <div className="space-y-4">
+        {models.map((model, index) => (
+          <div key={index} className="flex items-center justify-between">
+            <span>{model}</span>
+            <label className="switch">
+              <input
+                type="checkbox"
+                checked={selectedModels.includes(model)}
+                onChange={() => handleToggle(model)}
+              />
+              <span className="slider round"></span>
+            </label>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
