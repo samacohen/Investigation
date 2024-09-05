@@ -16,12 +16,12 @@ const ModelSelection = ({ selectedModels, setSelectedModels }) => {
   };
 
   return (
-    <div>
-      <h2 className="text-lg font-bold mb-4">Model Selection</h2>
+    <div className="bg-white bg-opacity-20 backdrop-blur-lg p-4 rounded-lg">
+      <h2 className="text-lg font-bold mb-4 text-black">Model Selection</h2>
       <div className="space-y-4">
         {models.map((model, index) => (
           <div key={index} className="flex items-center justify-between">
-            <span>{model}</span>
+            <span className="text-black">{model}</span>
             <label className="switch">
               <input
                 type="checkbox"
