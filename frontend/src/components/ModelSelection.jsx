@@ -3,7 +3,7 @@
 import React from 'react';
 
 const ModelSelection = ({ selectedModels, setSelectedModels }) => {
-  const models = ['Model 1', 'Model 2', 'Model 3', 'Model 4', 'Model 5'];
+  const models = ['Gemini', 'ChatGPT', 'Claude', 'Llama'];
 
   const handleToggle = (model) => {
     setSelectedModels((prevSelected) => {

@@ -11,13 +11,49 @@ const DashboardPage = () => {
   const [messages, setMessages] = useState([]);
   const [selectedModels, setSelectedModels] = useState([]);
 
-  const addMessage = (message) => {
-    const responses = selectedModels.map((model) => ({
-      text: `${model} response: ${message.text}`,
-      isUser: false,
-      model: model,
-    }));
-    setMessages([...messages, { text: message.text, isUser: true }, ...responses]);
+  // Function to send prompt to Flask backend
+  const sendPromptToLLM = async (prompt, selectedModels) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/llm/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: prompt,
+          models: selectedModels,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error:', error);
+      return {};
+    }
+  };
+
+  const addMessage = async (message) => {
+    // Add user's message to the chat
+    setMessages((prevMessages) => [...prevMessages, { text: message.text, isUser: true }]);
+
+    // Send the prompt to selected models
+    const responses = await sendPromptToLLM(message.text, selectedModels);
+
+    if (responses && Object.keys(responses).length > 0) {
+      // Add responses from each model to the chat
+      const responseMessages = Object.keys(responses).map((model) => ({
+        text: `${model} response: ${responses[model]}`,
+        isUser: false,
+      }));
+      setMessages((prevMessages) => [...prevMessages, ...responseMessages]);
+    } else {
+      console.error('No valid response received from the backend');
+    }
   };
 
   return (
