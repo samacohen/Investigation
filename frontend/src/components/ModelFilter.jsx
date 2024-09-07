@@ -1,15 +1,19 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 
 const ModelFilter = ({ filteredModels, setFilteredModels }) => {
   // Memoize the models array to avoid recreating it on every render
   const models = useMemo(() => ['Gemini', 'ChatGPT', 'Claude', 'Llama'], []);
 
-  // Initialize filteredModels with all models selected by default
+  // useRef to track whether this is the first render
+  const isFirstRender = useRef(true);
+
+  // Initialize filteredModels with all models selected by default on first render
   useEffect(() => {
-    if (filteredModels.length === 0) {
-      setFilteredModels(models);  // Enable all models by default
+    if (isFirstRender.current) {
+      setFilteredModels(models); // Enable all models by default
+      isFirstRender.current = false; // Mark as no longer the first render
     }
-  }, [filteredModels, setFilteredModels, models]); // 'models' is now stable and won't cause unnecessary renders
+  }, [models, setFilteredModels]);
 
   const handleToggle = (model) => {
     setFilteredModels((prevFiltered) => {
