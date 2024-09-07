@@ -1,9 +1,16 @@
 // src/components/ModelFilter.jsx
 
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const ModelFilter = ({ filteredModels, setFilteredModels }) => {
   const models = ['Gemini', 'ChatGPT', 'Claude', 'Llama'];
+
+  // Initialize filteredModels with all models selected by default
+  useEffect(() => {
+    if (filteredModels.length === 0) {
+      setFilteredModels(models);  // Enable all models by default
+    }
+  }, [filteredModels, setFilteredModels]);
 
   const handleToggle = (model) => {
     setFilteredModels((prevFiltered) => {
