@@ -1,16 +1,15 @@
-// src/components/ModelFilter.jsx
-
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 const ModelFilter = ({ filteredModels, setFilteredModels }) => {
-  const models = ['Gemini', 'ChatGPT', 'Claude', 'Llama'];
+  // Memoize the models array to avoid recreating it on every render
+  const models = useMemo(() => ['Gemini', 'ChatGPT', 'Claude', 'Llama'], []);
 
   // Initialize filteredModels with all models selected by default
   useEffect(() => {
     if (filteredModels.length === 0) {
       setFilteredModels(models);  // Enable all models by default
     }
-  }, [filteredModels, setFilteredModels]);
+  }, [filteredModels, setFilteredModels, models]); // 'models' is now stable and won't cause unnecessary renders
 
   const handleToggle = (model) => {
     setFilteredModels((prevFiltered) => {
