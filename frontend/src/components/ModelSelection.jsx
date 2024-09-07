@@ -1,16 +1,20 @@
 // src/components/ModelSelection.jsx
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 
 const ModelSelection = ({ selectedModels, setSelectedModels }) => {
   // Memoize the models array to prevent it from being recreated on every render
   const models = useMemo(() => ['Gemini', 'ChatGPT', 'Claude', 'Llama'], []);
 
-  // Use useEffect to select all models by default when the component is first rendered
+  // useRef to track whether this is the first render
+  const isFirstRender = useRef(true);
+
+  // Use useEffect to select all models by default only on the first render
   useEffect(() => {
-    if (selectedModels.length === 0) {
+    if (isFirstRender.current) {
       setSelectedModels(models); // Set all models as selected by default
+      isFirstRender.current = false; // Mark as no longer the first render
     }
-  }, [selectedModels, setSelectedModels, models]);
+  }, [models, setSelectedModels]);
 
   const handleToggle = (model) => {
     setSelectedModels((prevSelected) => {
