@@ -86,7 +86,7 @@ const DashboardPage = () => {
             <ModelFilter filteredModels={filteredModels} setFilteredModels={setFilteredModels} />
             {/* Clear Chat Button */}
             <button
-              className="mt-4 px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+              className="w-full mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
               onClick={clearChat}
             >
               Clear Chat
