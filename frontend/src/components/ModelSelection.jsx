@@ -1,9 +1,16 @@
 // src/components/ModelSelection.jsx
-
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 const ModelSelection = ({ selectedModels, setSelectedModels }) => {
-  const models = ['Gemini', 'ChatGPT', 'Claude', 'Llama'];
+  // Memoize the models array to prevent it from being recreated on every render
+  const models = useMemo(() => ['Gemini', 'ChatGPT', 'Claude', 'Llama'], []);
+
+  // Use useEffect to select all models by default when the component is first rendered
+  useEffect(() => {
+    if (selectedModels.length === 0) {
+      setSelectedModels(models); // Set all models as selected by default
+    }
+  }, [selectedModels, setSelectedModels, models]);
 
   const handleToggle = (model) => {
     setSelectedModels((prevSelected) => {
