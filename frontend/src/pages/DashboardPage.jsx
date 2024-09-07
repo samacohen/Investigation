@@ -59,6 +59,11 @@ const DashboardPage = () => {
     }
   };
 
+  // Function to clear chat messages
+  const clearChat = () => {
+    setMessages([]);
+  };
+
   return (
     <div
       className="relative flex flex-col min-h-screen"
@@ -79,6 +84,13 @@ const DashboardPage = () => {
           <div className="w-1/6 p-4 bg-white bg-opacity-20 backdrop-blur-lg rounded-lg">
             <ModelSelection selectedModels={selectedModels} setSelectedModels={setSelectedModels} />
             <ModelFilter filteredModels={filteredModels} setFilteredModels={setFilteredModels} />
+            {/* Clear Chat Button */}
+            <button
+              className="mt-4 px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+              onClick={clearChat}
+            >
+              Clear Chat
+            </button>
           </div>
 
           {/* Right 5/6 - Chatbot Interface */}
