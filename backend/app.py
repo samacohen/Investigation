@@ -5,9 +5,31 @@ from flask_cors import CORS
 import google.generativeai as genai
 import os
 import requests
+from pymongo import MongoClient
+from pymongo.server_api import ServerApi
+from datetime import datetime
+from dotenv import load_dotenv
+
+#Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
+
+# MongoDB setup
+MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017')
+client = MongoClient(MONGO_URI, server_api=ServerApi("1"))
+
+#Test mongoDB connection:
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
+
+
+db = client['llm_database']  # Create/use (if already existing) a database called 'llm_database'
+collection = db['responses']  # Create/use (if already existing) a collection called 'responses'
 
 # Placeholder functions for LLMs
 def query_gemini(prompt):
@@ -46,6 +68,16 @@ def llm():
         responses['Claude'] = query_claude(prompt)
     if 'Llama' in models:
         responses['Llama'] = query_llama(prompt)
+
+
+    # Save the prompt and responses to MongoDB
+    document = {
+        "prompt": prompt,
+        "responses": responses,
+        "models": models,
+        "timestamp": datetime.utcnow()
+    }
+    collection.insert_one(document)
 
     return jsonify(responses)
 
