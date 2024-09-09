@@ -1,17 +1,21 @@
 // src/pages/DashboardPage.jsx
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ModelSelection from '../components/ModelSelection';
 import ModelFilter from '../components/ModelFilter'; // Import the new ModelFilter component
 import ChatInput from '../components/ChatInput';
 import ChatDisplay from '../components/ChatDisplay';
 import Header from '../components/Header';
 import backgroundImage from '../assets/background.png'; // Import background image
+import ChatHistoryModal from '../components/ChatHistoryModal'; // Import Modal component
+import axios from 'axios'; //Used for fetching data
 
 const DashboardPage = () => {
   const [messages, setMessages] = useState([]);
   const [selectedModels, setSelectedModels] = useState([]); // For selecting models to send prompts to
   const [filteredModels, setFilteredModels] = useState([]); // For filtering displayed model responses
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [chatHistory, setChatHistory] = useState([]); // State to store chat history
 
   // Function to send prompt to Flask backend
   const sendPromptToLLM = async (prompt, selectedModels) => {
@@ -64,6 +68,22 @@ const DashboardPage = () => {
     setMessages([]);
   };
 
+
+  // Function to fetch chat history from MongoDB
+  const fetchChatHistory = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/chats');
+      setChatHistory(response.data);
+      setIsModalOpen(true)
+    } catch (error) {
+      console.error('Error fetching chat history:', error);
+    }
+  };
+
+  const showChatHistory = async () => {
+    fetchChatHistory()
+  }
+
   return (
     <div
       className="relative flex flex-col min-h-screen"
@@ -91,13 +111,22 @@ const DashboardPage = () => {
             >
               Clear Chat
             </button>
+
+            <button
+              className="w-full mt-4 px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300"
+              onClick={showChatHistory} // Function to open the modal
+            >
+              Chat History
+            </button>
+            {/*isModalOpen && <Modal chatHistory={chatHistory} onClose={closeModal} />*/}
+
           </div>
 
           {/* Right 5/6 - Chatbot Interface */}
           <div className="flex-1 flex flex-col ml-4 bg-white bg-opacity-20 backdrop-blur-lg rounded-lg p-4">
             {/* Chat Display */}
             <div className="flex-1 overflow-y-auto p-4 bg-white bg-opacity-20 backdrop-blur-lg rounded-lg">
-              <ChatDisplay messages={messages.filter((message) => 
+              <ChatDisplay messages={messages.filter((message) =>
                 message.isUser || filteredModels.includes(message.model)
               )} />
             </div>
@@ -114,6 +143,14 @@ const DashboardPage = () => {
             </div>
           </div>
         </div>
+
+        {/* Modal for Chat History */}
+        {isModalOpen && (
+          <ChatHistoryModal chats={chatHistory} onClose={() => setIsModalOpen(false)}>
+            
+          </ChatHistoryModal>
+        )}
+
       </div>
     </div>
   );

@@ -31,6 +31,13 @@ except Exception as e:
 db = client['llm_database']  # Create/use (if already existing) a database called 'llm_database'
 collection = db['responses']  # Create/use (if already existing) a collection called 'responses'
 
+@app.route('/api/chats', methods=['GET'])
+def get_chats():
+    chats = collection.find()
+    chat_list = [{'prompt': chat['prompt'], 'response': chat['responses']} for chat in chats]
+    print(jsonify(chat_list))
+    return jsonify(chat_list)
+
 # Placeholder functions for LLMs
 def query_gemini(prompt):
     GEMINI_API_KEY = os.getenv('GEMINI_FREE_API_KEY')
@@ -41,13 +48,13 @@ def query_gemini(prompt):
     return response.text if response else "No response from Gemini."
 
 def query_chatgpt(prompt):
-    return 'Response from ChatGPT'
+    return 'No response from ChatGPT'
 
 def query_claude(prompt):
-    return 'Response from Claude'
+    return 'No response from Claude'
 
 def query_llama(prompt):
-    return 'Response from Llama'
+    return 'No response from Llama'
 
 @app.route('/api/llm/', methods=['POST'])
 def llm():
