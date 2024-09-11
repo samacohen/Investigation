@@ -9,6 +9,7 @@ from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 from datetime import datetime
 from dotenv import load_dotenv
+from openai import OpenAI
 
 #Load environment variables
 load_dotenv()
@@ -38,6 +39,9 @@ def get_chats():
     print(jsonify(chat_list))
     return jsonify(chat_list)
 
+#Create OpenAI client
+openAIClient = OpenAI()
+
 # Placeholder functions for LLMs
 def query_gemini(prompt):
     GEMINI_API_KEY = os.getenv('GEMINI_FREE_API_KEY')
@@ -48,7 +52,18 @@ def query_gemini(prompt):
     return response.text if response else "No response from Gemini."
 
 def query_chatgpt(prompt):
-    return 'No response from ChatGPT'
+    OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+    completion = openAIClient.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[
+        {"role": "system", "content": "You are a helpful assistant."},
+        {
+            "role": "user",
+            "content": prompt
+        }
+    ]
+)
+    return completion.choices[0].message.content if completion else 'No response from ChatGPT'
 
 def query_claude(prompt):
     return 'No response from Claude'
