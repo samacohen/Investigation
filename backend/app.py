@@ -12,6 +12,7 @@ from pymongo.server_api import ServerApi
 from datetime import datetime
 from dotenv import load_dotenv
 from openai import OpenAI
+from huggingface_hub import InferenceClient
 
 
 #Load environment variables
@@ -83,7 +84,27 @@ def query_claude(prompt):
     return message.content[0].text if message else 'No response from Claude'
 
 def query_llama(prompt):
-    return 'No response from Llama'
+    # Initialize the Hugging Face inference client for the LLaMA model
+    client = InferenceClient(
+        "meta-llama/Meta-Llama-3.1-8B-Instruct",  # Specify the LLaMA model
+        token=os.getenv("HUGGINGFACE_TOKEN")  # Hugging Face token from environment variables
+    )
+
+    # Send the prompt to the LLaMA model and collect the response
+    try:
+        response = ""
+        for message in client.chat_completion(
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=500,
+            stream=True,  # Streaming response from LLaMA
+        ):
+            # Accumulate the streamed response chunks
+            response += message.choices[0].delta.content
+
+        # Return the final response once the stream is complete
+        return response if response else "No response from LLaMA."
+    except Exception as e:
+        return f"Error querying LLaMA: {str(e)}"
 
 @app.route('/api/llm/', methods=['POST'])
 def llm():
