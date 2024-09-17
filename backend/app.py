@@ -149,8 +149,8 @@ def llm():
         responses['Claude'] = query_claude(prompt)
     if 'Llama' in models:
         responses['Llama'] = query_llama(prompt)
-    if 'GLM4-Flash' in models:
-        responses['GLM4-Flash'] = query_glm4_flash(prompt)
+    if 'ChatGLM4-Flash' in models:
+        responses['ChatGLM4-Flash'] = query_glm4_flash(prompt)
 
 
     # Save the prompt and responses to MongoDB
