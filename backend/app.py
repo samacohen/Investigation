@@ -1,15 +1,18 @@
 # backend/app.py
 
-from flask import Flask, request, jsonify
-from flask_cors import CORS
 import google.generativeai as genai
 import os
 import requests
+import anthropic
+
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 from datetime import datetime
 from dotenv import load_dotenv
 from openai import OpenAI
+
 
 #Load environment variables
 load_dotenv()
@@ -42,6 +45,10 @@ def get_chats():
 #Create OpenAI client
 openAIClient = OpenAI()
 
+anthropicClient = anthropic.Anthropic(
+    api_key = os.getenv('ANTHROPIC_API_KEY')
+)
+
 # Placeholder functions for LLMs
 def query_gemini(prompt):
     GEMINI_API_KEY = os.getenv('GEMINI_FREE_API_KEY')
@@ -66,7 +73,14 @@ def query_chatgpt(prompt):
     return completion.choices[0].message.content if completion else 'No response from ChatGPT'
 
 def query_claude(prompt):
-    return 'No response from Claude'
+    message = anthropicClient.messages.create(
+        model='claude-3-5-sonnet-20240620',
+        max_tokens=500,
+        messages=[
+            {'role': 'user', 'content': prompt}
+        ]
+    )
+    return message.content[0].text if message else 'No response from Claude'
 
 def query_llama(prompt):
     return 'No response from Llama'
