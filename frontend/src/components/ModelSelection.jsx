@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 
 const ModelSelection = ({ selectedModels, setSelectedModels }) => {
   // Memoize the models array to prevent it from being recreated on every render
-  const models = useMemo(() => ['Gemini', 'ChatGPT', 'Claude', 'Llama'], []);
+  const models = useMemo(() => ['Gemini', 'ChatGPT', 'Claude', 'Llama', 'ChatGLM4-Flash'], []);
 
   // useRef to track whether this is the first render
   const isFirstRender = useRef(true);

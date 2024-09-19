@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 
 const ModelFilter = ({ filteredModels, setFilteredModels }) => {
   // Memoize the models array to avoid recreating it on every render
-  const models = useMemo(() => ['Gemini', 'ChatGPT', 'Claude', 'Llama'], []);
+  const models = useMemo(() => ['Gemini', 'ChatGPT', 'Claude', 'Llama', 'ChatGLM4-Flash'], []);
 
   // useRef to track whether this is the first render
   const isFirstRender = useRef(true);
