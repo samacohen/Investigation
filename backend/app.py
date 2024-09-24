@@ -4,6 +4,7 @@ import google.generativeai as genai
 import os
 import requests
 import anthropic
+import replicate
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -13,7 +14,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from openai import OpenAI
 from huggingface_hub import InferenceClient
-#from zhipuai import ZhipuAI
+from zhipuai import ZhipuAI
 
 #Load environment variables
 load_dotenv()
@@ -52,7 +53,7 @@ anthropicClient = anthropic.Anthropic(
 )
 
 
-#chatGLMclient = ZhipuAI(api_key=os.getenv('GLM_API_KEY'))
+chatGLMclient = ZhipuAI(api_key=os.getenv('GLM_API_KEY'))
 
 universalPrompt = "Pretend you are a triage specialist working in a large South African public hospital. For the triage scenario given to you, use only the information provided to make your triage decisions. You must triage the patients, you must list the order in which you will treat the patients with their patient number and you must explain your reasoning. You are only to answer medical triage questions. The scenario is as follows:"
 
@@ -62,62 +63,55 @@ def query_gemini(prompt):
     genai.configure(api_key= GEMINI_API_KEY)
 
     model = genai.GenerativeModel("gemini-1.5-flash")
-    response = model.generate_content(prompt)
+    response = model.generate_content(universalPrompt + " " + prompt)
     return response.text if response else "No response from Gemini."
 
 def query_chatgpt(prompt):
     OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
     completion = openAIClient.chat.completions.create(
-    model="gpt-4o-mini",
+    model="gpt-4o",
     messages=[
         {"role": "system", "content": "You are a helpful assistant."},
         {
             "role": "user",
-            "content": prompt
+            "content": universalPrompt + " " + prompt
         }
-    ]
+    ],
+    max_tokens=512
 )
     return completion.choices[0].message.content if completion else 'No response from ChatGPT'
 
 def query_claude(prompt):
     message = anthropicClient.messages.create(
         model='claude-3-5-sonnet-20240620',
-        max_tokens=500,
+        max_tokens=512,
         messages=[
-            {'role': 'user', 'content': prompt}
+            {'role': 'user', 'content': universalPrompt + " " + prompt}
         ]
     )
     return message.content[0].text if message else 'No response from Claude'
 
 def query_llama(prompt):
-    # Initialize the Hugging Face inference client for the LLaMA model
-    client = InferenceClient(
-        "meta-llama/Meta-Llama-3.1-8B-Instruct",  # Specify the LLaMA model
-        token=os.getenv("HUGGINGFACE_TOKEN")  # Hugging Face token from environment variables
-    )
+   output = ""
+   input = {
+       "prompt": universalPrompt + " " + prompt,
+       "max_tokens": 512
+   }
 
-    # Send the prompt to the LLaMA model and collect the response
-    try:
-        response = ""
-        for message in client.chat_completion(
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=500,
-            stream=True,  # Streaming response from LLaMA
-        ):
-            # Accumulate the streamed response chunks
-            response += message.choices[0].delta.content
+   for event in replicate.stream (
+       "meta/meta-llama-3.1-405b-instruct",
+       input = input
+   ):
+        output += str(event)
 
-        # Return the final response once the stream is complete
-        return response if response else "No response from LLaMA."
-    except Exception as e:
-        return f"Error querying LLaMA: {str(e)}"
+   return output
     
-"""def query_glm4_flash(prompt):
+def query_glm4_flash(prompt):
     response = chatGLMclient.chat.completions.create(
         model="glm-4-flash",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
+            {"role": "user", "content": universalPrompt + " " + prompt}
         ],
         top_p=0.7,
         temperature=0.95,
@@ -130,7 +124,7 @@ def query_llama(prompt):
     for chunk in response:
         full_response += chunk.choices[0].delta.content
 
-    return full_response if full_response else 'No response from GLM-4-Flash'"""
+    return full_response if full_response else 'No response from GLM-4-Flash'
 
 @app.route('/api/llm/', methods=['POST'])
 def llm():
@@ -157,7 +151,7 @@ def llm():
 
     # Save the prompt and responses to MongoDB
     document = {
-        "prompt": prompt,
+        "prompt": universalPrompt + " " + prompt,
         "responses": responses,
         "models": models,
         "timestamp": datetime.utcnow()
