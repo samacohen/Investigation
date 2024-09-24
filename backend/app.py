@@ -13,7 +13,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from openai import OpenAI
 from huggingface_hub import InferenceClient
-from zhipuai import ZhipuAI
+#from zhipuai import ZhipuAI
 
 #Load environment variables
 load_dotenv()
@@ -52,9 +52,11 @@ anthropicClient = anthropic.Anthropic(
 )
 
 
-chatGLMclient = ZhipuAI(api_key=os.getenv('GLM_API_KEY'))
+#chatGLMclient = ZhipuAI(api_key=os.getenv('GLM_API_KEY'))
 
-# Placeholder functions for LLMs
+universalPrompt = "Pretend you are a triage specialist working in a large South African public hospital. For the triage scenario given to you, use only the information provided to make your triage decisions. You must triage the patients, you must list the order in which you will treat the patients with their patient number and you must explain your reasoning. You are only to answer medical triage questions. The scenario is as follows:"
+
+# Functions to query LLMs
 def query_gemini(prompt):
     GEMINI_API_KEY = os.getenv('GEMINI_FREE_API_KEY')
     genai.configure(api_key= GEMINI_API_KEY)
@@ -110,7 +112,7 @@ def query_llama(prompt):
     except Exception as e:
         return f"Error querying LLaMA: {str(e)}"
     
-def query_glm4_flash(prompt):
+"""def query_glm4_flash(prompt):
     response = chatGLMclient.chat.completions.create(
         model="glm-4-flash",
         messages=[
@@ -128,7 +130,7 @@ def query_glm4_flash(prompt):
     for chunk in response:
         full_response += chunk.choices[0].delta.content
 
-    return full_response if full_response else 'No response from GLM-4-Flash'
+    return full_response if full_response else 'No response from GLM-4-Flash'"""
 
 @app.route('/api/llm/', methods=['POST'])
 def llm():
