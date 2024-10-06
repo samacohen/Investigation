@@ -55,7 +55,7 @@ anthropicClient = anthropic.Anthropic(
 
 chatGLMclient = ZhipuAI(api_key=os.getenv('GLM_API_KEY'))
 
-universalPrompt = "Pretend you are a triage specialist working in a large South African public hospital. For the triage scenario given to you, use only the information provided to make your triage decisions. You must triage the patients, you must list the order in which you will treat the patients with their patient number and you must explain your reasoning. You are only to answer medical triage questions. The scenario is as follows:"
+universalPrompt = "Pretend you are a triage specialist working in a large public hospital. For the triage scenario given to you, use only the information provided to make your triage decisions. You must triage the patients, you must list the order in which you will treat the patients with their patient number and you must explain your reasoning. You are only to answer medical triage questions. The scenario is as follows:"
 
 # Functions to query LLMs
 def query_gemini(prompt):
