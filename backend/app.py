@@ -5,6 +5,7 @@ import os
 import requests
 import anthropic
 import replicate
+import certifi
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -24,7 +25,7 @@ CORS(app)
 
 # MongoDB setup
 MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017')
-client = MongoClient(MONGO_URI, server_api=ServerApi("1"))
+client = MongoClient(MONGO_URI, server_api=ServerApi("1"), tlsCAFile=certifi.where())
 
 
 #Test mongoDB connection:

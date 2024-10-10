@@ -16,10 +16,12 @@ const DashboardPage = () => {
   const [filteredModels, setFilteredModels] = useState([]); // For filtering displayed model responses
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
   const [chatHistory, setChatHistory] = useState([]); // State to store chat history
+  const [loading, setLoading] = useState(false);
 
   // Function to send prompt to Flask backend
   const sendPromptToLLM = async (prompt, selectedModels) => {
     try {
+      setLoading(true);
       const response = await fetch('http://localhost:5000/api/llm/', {
         method: 'POST',
         headers: {
@@ -36,9 +38,11 @@ const DashboardPage = () => {
       }
 
       const data = await response.json();
+      setLoading(false);
       return data;
     } catch (error) {
       console.error('Error:', error);
+      setLoading(false);
       return {};
     }
   };
@@ -141,6 +145,12 @@ const DashboardPage = () => {
                 </p>
               )}
             </div>
+            {/* Loading Spinner */}
+            {loading && (
+              <div className="flex justify-center items-center mt-4">
+                <div className="loader"></div>
+              </div>  
+            )}
           </div>
         </div>
 
