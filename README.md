@@ -12,7 +12,6 @@ This project investigates the ethical alignment of Large Language Models (LLMs) 
 2. Install the required dependencies.
 3. Run the Flask server and open the React front-end.
 
-For detailed instructions, please refer to the project documentation.
 
 ## Folder Structure
 - **frontend**: Contains everything related to the front-end, including React components and Tailwind CSS styles.
